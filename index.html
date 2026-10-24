@@ -344,7 +344,7 @@ a.cta,a.go{text-decoration:none}
     </div>
     <div class="tiers" data-tiers></div>
     <p class="friends">اطلب ويّا أصدقائك أو أهلك: كل ما زاد عدد العروض زاد خصمك، لحد <b class="n" style="color:var(--br)">284,000</b> د.ع توفير على 3 عروض.</p>
-    <a class="cta" href="https://aljassmi.shop/products/1000007620/checkout" data-ck>اطلب الثنائي هسه
+    <a class="cta" href="#order" data-go>اطلب الثنائي هسه
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></a>
     <div class="chips">
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M10 3h4M10.5 3v4l-3 2.5v10a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5v-10L13.5 7V3"/></svg>تجرّب التستر قبل لا تدفع</span>
@@ -477,14 +477,18 @@ a.cta,a.go{text-decoration:none}
 <section class="order dark" id="order">
   <div class="wrap">
     <div class="kick">آخر خطوة</div>
-    <h2 class="h2" style="margin-top:4px">اطلب الثنائي هسه</h2>
-    <p class="lead" style="margin-top:6px">تضغط الزر، تكتب اسمك ورقمك وعنوانك، وتختار شكد عرض تريد. ما تدفع شي هسه، المندوب يوصلك ويّا التستر.</p>
-    <div class="glass form">
+    <h2 class="h2" style="margin-top:4px">ثبّت طلبك</h2>
+    <p class="lead" style="margin-top:6px">ما تدفع شي هسه. نتصل بيك نأكد، والمندوب يوصلك ويّا التستر.</p>
+    <form class="glass form" id="form" novalidate>
+      <div class="f"><label for="nm">الاسم</label><input id="nm" name="name" autocomplete="name" required><div class="em">اكتب اسمك</div></div>
+      <div class="f"><label for="ph">رقم الموبايل</label><input id="ph" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07xxxxxxxxx" dir="ltr" style="text-align:right" required><div class="em">اكتب رقم عراقي صحيح يبدي بـ07</div></div>
+      <div class="f"><label for="gv">المحافظة</label><select id="gv" name="governorate" required><option value="">اختار المحافظة</option></select><div class="em">اختار المحافظة</div></div>
+      <div class="f"><label for="ad">العنوان (المنطقة وأقرب نقطة دالة)</label><textarea id="ad" name="address" required></textarea><div class="em">اكتب عنوانك</div></div>
+      <div class="f"><label>شكد عرض تريد؟</label><div class="tiers" data-tiers style="margin-top:4px"></div></div>
       <div class="osum" id="osum"></div>
-      <a class="submit" id="sub" href="https://aljassmi.shop/products/1000007620/checkout" style="display:flex;align-items:center;justify-content:center;text-decoration:none">اطلب الآن · الدفع عند الاستلام</a>
-      <p style="font-size:13px;color:rgba(249,243,237,.7);text-align:center;margin-top:12px;line-height:1.7">بصفحة الطلب تختار العرض (واحد / عرضين / 3 عروض)، وتكدر تضيف عطر شعر بـ<span class="n">28,000</span> بدل <span class="n">58,000</span>.</p>
+      <button class="submit" id="sub" type="submit">ثبّت الطلب · الدفع عند الاستلام</button>
       <div class="osafe"><span>✓ تستر ويّا المندوب</span><span>✓ ضمان <span class="n">7</span> أيام</span><span>✓ ما تدفع إلا بعد ما تجرّب</span></div>
-    </div>
+    </form>
   </div>
 </section>
 
@@ -497,9 +501,11 @@ a.cta,a.go{text-decoration:none}
 <!-- sticky buy -->
 <div class="sticky" id="sticky"><div class="in">
   <div class="pr" id="stPr"></div>
-  <a class="go" href="https://aljassmi.shop/products/1000007620/checkout" data-ck style="display:flex;align-items:center;justify-content:center">اطلب الثنائي</a>
+  <a class="go" href="#order" data-go style="display:flex;align-items:center;justify-content:center">اطلب الثنائي</a>
 </div></div>
 
+<!-- upsell after order -->
+<div class="modal" id="up"><div class="sheet" id="upSheet"></div></div>
 
 <script>
 (function(){
@@ -637,9 +643,60 @@ var heroCta=$(".hero .cta"),orderSec=$("#order"),inHero=true,inOrder=false;
 function stick(){$("#sticky").classList.toggle("show",!inHero&&!inOrder)}
 new IntersectionObserver(function(e){inHero=e[0].isIntersecting;stick()}).observe(heroCta);
 new IntersectionObserver(function(e){inOrder=e[0].isIntersecting;stick()},{threshold:.05}).observe(orderSec);
+$$("[data-go]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();orderSec.scrollIntoView({behavior:"smooth"});setTimeout(function(){$("#nm").focus({preventScroll:true})},700)})});
 
-/* order: يروح لصفحة طلب روزنامة */
-$$("[data-ck]").forEach(function(a){a.addEventListener("click",function(){try{window.fbq&&fbq("track","InitiateCheckout",{content_ids:["1000007620"],content_type:"product",value:TIERS[SEL].price,currency:"IQD"})}catch(e){}})});
+/* ===== order form ===== */
+var GOV=["بغداد","البصرة","نينوى","أربيل","النجف","كربلاء","بابل","ذي قار","الأنبار","ديالى","صلاح الدين","كركوك","واسط","ميسان","الديوانية","المثنى","السليمانية","دهوك","حلبجة"];
+$("#gv").innerHTML+=GOV.map(function(g){return"<option>"+g+"</option>"}).join("");
+var toEn=function(v){return String(v||"").replace(/[٠-٩]/g,function(c){return c.charCodeAt(0)-1632}).replace(/[۰-۹]/g,function(c){return c.charCodeAt(0)-1776})};
+var normPhone=function(v){var d=toEn(v).replace(/\D/g,"").replace(/^00964/,"").replace(/^964/,"");if(d.charAt(0)==="7")d="0"+d;return d};
+function setErr(id,bad){$("#"+id).closest(".f").classList.toggle("err",bad);return bad}
+var ORDER=null;
+$("#form").addEventListener("submit",function(e){e.preventDefault();
+  var nm=$("#nm").value.trim(),ph=normPhone($("#ph").value),gv=$("#gv").value,ad=$("#ad").value.trim();
+  var bad=[setErr("nm",nm.length<2),setErr("ph",!/^07[3-9]\d{8}$/.test(ph)),setErr("gv",!gv),setErr("ad",ad.length<4)].some(Boolean);
+  if(bad){$(".f.err input,.f.err select,.f.err textarea").focus();return}
+  $("#sub").disabled=true;$("#sub").textContent="لحظة…";
+  var T=TIERS[SEL];ORDER={name:nm,phone:ph,governorate:gv,address:ad,items:[{id:OFFER.id,qty:T.q,price:T.price,listPrice:T.was}],total:T.price,shipping:OFFER.ship};
+  Backend.placeOrder(ORDER).then(function(res){ORDER.ref=res&&res.ref;showUpsell()}).catch(function(){$("#sub").disabled=false;$("#sub").textContent="صار خلل، جرّب مرة ثانية"});
+});
+
+/* ===== upsell: عطر الشعر بخصم 30 ألف بعد تثبيت الطلب ===== */
+var pick=null;
+function showUpsell(){
+  $("#upSheet").innerHTML='<div class="ok"><i>✓</i>طلبك تثبّت</div><h3>قبل لا نسكّر… عرض بس إلك هسه</h3><p class="lead">ضيف عطر شعر لنفس الطلب ونفس التوصيل، بخصم <b class="n" style="color:var(--br)">30,000</b> د.ع.</p><div class="hairs">'+
+   HAIR.items.map(function(h){return'<button class="hair" data-id="'+h.id+'"><img src="img-hair-'+h.id+'.jpg" alt="عطر شعر '+h.name+'"><b>'+h.name+'</b><div class="hp"><s>'+money(HAIR.was)+'</s><span>'+money(HAIR.price)+'</span></div></button>'}).join("")+
+   '</div><button class="add" id="addH" disabled>اختار عطر الشعر</button><button class="skip" id="skipH">لا شكراً، كمّل بدونه</button>';
+  $("#up").classList.add("open");document.body.style.overflow="hidden";
+  $$(".hair").forEach(function(b){b.addEventListener("click",function(){pick=b.dataset.id;$$(".hair").forEach(function(o){o.classList.toggle("on",o===b)});var h=HAIR.items.filter(function(x){return x.id===pick})[0];$("#addH").disabled=false;$("#addH").textContent="ضيف "+h.name+" بـ"+money(HAIR.price)+" د.ع"})});
+  $("#addH").addEventListener("click",function(){$("#addH").disabled=true;Backend.addUpsell(ORDER,{id:"hair-"+pick,qty:1,price:HAIR.price}).then(function(){done(true)})});
+  $("#skipH").addEventListener("click",function(){done(false)});
+}
+function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
+  $("#upSheet").innerHTML='<div class="done"><div class="ok" style="justify-content:center"><i>✓</i>تم</div><h3>شكراً '+ORDER.name.split(" ")[0]+' 🤍</h3><p class="lead">راح نتصل بيك على <span class="n" dir="ltr">'+ORDER.phone+'</span> نأكد العنوان. المجموع عند الاستلام <b class="n" style="color:var(--br)">'+money(tot)+'</b> د.ع، وتجرّب التستر قبل لا تدفع.</p><button class="add" id="closeUp">تمام</button></div>';
+  $("#closeUp").addEventListener("click",function(){$("#up").classList.remove("open");document.body.style.overflow=""});
+  $("#sub").textContent="تم تثبيت طلبك ✓";
+}
+
+/* ===== الربط: الطلب ينرسل لقناة تلكرام «طلبات الجسمي» بنفس صيغة الفريق =====
+   TG.token و TG.chat يتحطون من إعدادات محمد. بدونهم الصفحة تشتغل بوضع المعاينة (ما ينرسل شي). */
+var TG=window.AJ_TG||{token:"",chat:""};
+function tgSend(text){
+  if(!TG.token||!TG.chat){console.info("[معاينة] رسالة تلكرام:\n"+text);return new Promise(function(r){setTimeout(function(){r({ok:true,preview:true})},500)});}
+  return fetch("https://api.telegram.org/bot"+TG.token+"/sendMessage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:TG.chat,text:text,disable_web_page_preview:true})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.description||"tg");return j});
+}
+function tierLabel(o){var q=o.items[0].qty;return q===1?"الثنائي المختلف (سارفن + كيفورا + مخمرية)":q===2?"الثنائي المختلف × 2 (عرضين، خصم إضافي 50 ألف)":"الثنائي المختلف × 3 (3 عروض، خصم إضافي 125 ألف)"}
+function orderText(o,extra){
+  var lines=["الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"الطلب:","المنتج: "+tierLabel(o)];
+  if(extra) lines.push("+ "+extra.name+" بـ"+money(extra.price)+" (خصم 30 ألف)");
+  lines.push("السعر: "+money(o.total+(extra?extra.price:0))+" وتوصيل "+money(o.shipping));
+  lines.push("","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف");
+  return lines.join("\n");
+}
+var Backend={
+  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return tgSend("#طلب_جديد "+o.ref+"\n"+orderText(o)).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
+  addUpsell:function(o,item){var h=HAIR.items.filter(function(x){return "hair-"+x.id===item.id})[0];return tgSend("#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+" · الرقم: "+o.phone+"\n+ عطر شعر "+(h?h.name:item.id)+" بـ"+money(item.price)+" (خصم 30 ألف)\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping))}
+};
 })();
 </script>
 </body>
