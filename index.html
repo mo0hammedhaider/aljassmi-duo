@@ -254,6 +254,7 @@ function paintTiers(){
 .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--iv);background:rgba(249,243,237,.13)}
 .f.err input,.f.err select{border-color:#e5a39a}
 .f .em{display:none;font-size:12px;color:#f0b8b0;margin-top:5px}.f.err .em{display:block}
+.f .hint{font-size:12px;color:rgba(249,243,237,.65);margin-top:5px;min-height:14px}.f .hint.ok{color:#9fd3a8}
 .osum{margin:6px 0 14px;padding:14px;border-radius:16px;background:rgba(249,243,237,.08);font-size:14.5px}
 .osum div{display:flex;justify-content:space-between;padding:4px 0;color:rgba(249,243,237,.8)}
 .osum .tot{border-top:1px solid rgba(249,243,237,.15);margin-top:6px;padding-top:10px;color:var(--iv);font-weight:900;font-size:17px}
@@ -481,7 +482,7 @@ a.cta,a.go{text-decoration:none}
     <p class="lead" style="margin-top:6px">ما تدفع شي هسه. نتصل بيك نأكد، والمندوب يوصلك ويّا التستر.</p>
     <form class="glass form" id="form" novalidate>
       <div class="f"><label for="nm">الاسم</label><input id="nm" name="name" autocomplete="name" required><div class="em">اكتب اسمك</div></div>
-      <div class="f"><label for="ph">رقم الموبايل</label><input id="ph" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07xxxxxxxxx" dir="ltr" style="text-align:right" required><div class="em">اكتب رقم عراقي صحيح يبدي بـ07</div></div>
+      <div class="f"><label for="ph">رقم الموبايل</label><input id="ph" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07xxxxxxxxx" dir="ltr" style="text-align:right" maxlength="11" required><div class="em" id="phMsg">اكتب رقم عراقي صحيح يبدي بـ07</div><div class="hint" id="phHint"></div></div>
       <div class="f"><label for="gv">المحافظة</label><select id="gv" name="governorate" required><option value="">اختار المحافظة</option></select><div class="em">اختار المحافظة</div></div>
       <div class="f"><label for="ad">العنوان (المنطقة وأقرب نقطة دالة)</label><textarea id="ad" name="address" required></textarea><div class="em">اكتب عنوانك</div></div>
       <div class="f"><label>كم مجموعة تريد من هذا العرض؟</label><div class="tiers" data-tiers style="margin-top:4px"></div></div>
@@ -652,9 +653,18 @@ var toEn=function(v){return String(v||"").replace(/[٠-٩]/g,function(c){return 
 var normPhone=function(v){var d=toEn(v).replace(/\D/g,"").replace(/^00964/,"").replace(/^964/,"");if(d.charAt(0)==="7")d="0"+d;return d};
 function setErr(id,bad){$("#"+id).closest(".f").classList.toggle("err",bad);return bad}
 var ORDER=null;
+/* رقم الموبايل: الأرقام العربية تتحول إنكليزي تلقائياً، أرقام فقط، 11 رقم بالضبط */
+(function(){var ph=$("#ph"),hint=$("#phHint");
+  function fix(){var v=toEn(ph.value).replace(/\D/g,"");if(v.length>11)v=v.slice(0,11);if(ph.value!==v)ph.value=v;
+    if(!v){hint.textContent="";hint.className="hint";return}
+    if(v.length<11){hint.textContent="الرقم ناقص: "+v.length+" من 11";hint.className="hint"}
+    else if(!/^07[3-9]/.test(v)){hint.textContent="الرقم لازم يبدي بـ07";hint.className="hint"}
+    else{hint.textContent="✓ الرقم كامل";hint.className="hint ok";ph.closest(".f").classList.remove("err")}}
+  ph.addEventListener("input",fix);ph.addEventListener("blur",fix);ph.addEventListener("paste",function(){setTimeout(fix,0)});
+})();
 $("#form").addEventListener("submit",function(e){e.preventDefault();
   var nm=$("#nm").value.trim(),ph=normPhone($("#ph").value),gv=$("#gv").value,ad=$("#ad").value.trim();
-  var bad=[setErr("nm",nm.length<2),setErr("ph",!/^07[3-9]\d{8}$/.test(ph)),setErr("gv",!gv),setErr("ad",ad.length<4)].some(Boolean);
+  var bad=[setErr("nm",nm.length<2),setErr("ph",!/^07[3-9]\d{8}$/.test(ph)) && ($("#phMsg").textContent=ph.length<11?"الرقم ناقص: "+ph.length+" من 11":"اكتب رقم عراقي صحيح يبدي بـ07"),setErr("gv",!gv),setErr("ad",ad.length<4)].some(Boolean);
   if(bad){$(".f.err input,.f.err select,.f.err textarea").focus();return}
   $("#sub").disabled=true;$("#sub").textContent="لحظة…";
   var T=TIERS[SEL];ORDER={name:nm,phone:ph,governorate:gv,address:ad,items:[{id:OFFER.id,qty:T.q,price:T.price,listPrice:T.was}],total:T.price,shipping:OFFER.ship};
@@ -669,7 +679,7 @@ function showUpsell(){
    '</div><button class="add" id="addH" disabled>اختار عطر الشعر</button><button class="skip" id="skipH">لا شكراً، كمّل بدونه</button>';
   $("#up").classList.add("open");document.body.style.overflow="hidden";
   $$(".hair").forEach(function(b){b.addEventListener("click",function(){pick=b.dataset.id;$$(".hair").forEach(function(o){o.classList.toggle("on",o===b)});var h=HAIR.items.filter(function(x){return x.id===pick})[0];$("#addH").disabled=false;$("#addH").textContent="ضيف "+h.name+" بـ"+money(HAIR.price)+" د.ع"})});
-  $("#addH").addEventListener("click",function(){$("#addH").disabled=true;Backend.addUpsell(ORDER,{id:"hair-"+pick,qty:1,price:HAIR.price}).then(function(){done(true)})});
+  $("#addH").addEventListener("click",function(){$("#addH").disabled=true;$("#addH").textContent="لحظة…";Backend.addUpsell(ORDER,{id:"hair-"+pick,qty:1,price:HAIR.price}).then(function(){done(true)}).catch(function(){$("#addH").disabled=false;$("#addH").textContent="صار خلل، جرّب مرة ثانية"})});
   $("#skipH").addEventListener("click",function(){done(false)});
 }
 function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
@@ -696,7 +706,7 @@ function orderText(o,extra){
 }
 var Backend={
   placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return relay({kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o),text:"#طلب_جديد "+o.ref+"\n"+orderText(o)}).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
-  addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة:\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
+  addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة (لطلب الثنائي المختلف):\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
 };
 })();
 </script>
