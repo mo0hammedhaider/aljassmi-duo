@@ -533,6 +533,7 @@ a.cta,a.go{text-decoration:none}
 var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 
 /* ===== إعدادات العرض ===== */
+var RELAY="https://script.google.com/macros/s/AKfycbzCI8ZMLFJSYv1Bxrq01OtwmTzFmahi41_Ii9qMr-WVUacFA4u-e7E7tghx_Dbqhd6wXg/exec";
 var OFFER={id:"duo",name:"الثنائي المختلف",price:118000,was:171000,ship:5000};
 var TIERS=[{q:1,t:"عرض واحد",sub:"سارفن + كيفورا + مخمرية",price:118000},
            {q:2,t:"عرضين",sub:"إلك ولصديقك · خصم إضافي 50,000",price:186000,badge:"الأكثر طلباً"},
@@ -713,7 +714,6 @@ function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
 
 /* ===== الربط: الطلب يروح لوسيط آمن (Google Apps Script) → قناة تلكرام «طلبات الجسمي» + شيت =====
    التوكن مو هنا؛ موجود بحساب الدار. */
-var RELAY="https://script.google.com/macros/s/AKfycbzCI8ZMLFJSYv1Bxrq01OtwmTzFmahi41_Ii9qMr-WVUacFA4u-e7E7tghx_Dbqhd6wXg/exec";
 function relay(payload){
   return fetch(RELAY,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(payload),redirect:"follow"})
     .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error||"relay");return j});
