@@ -678,12 +678,12 @@ function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
   $("#sub").textContent="تم تثبيت طلبك ✓";
 }
 
-/* ===== الربط: الطلب ينرسل لقناة تلكرام «طلبات الجسمي» بنفس صيغة الفريق =====
-   TG.token و TG.chat يتحطون من إعدادات محمد. بدونهم الصفحة تشتغل بوضع المعاينة (ما ينرسل شي). */
-var TG=window.AJ_TG||{token:"",chat:"-1004343401586"};
-function tgSend(text){
-  if(!TG.token||!TG.chat){console.info("[معاينة] رسالة تلكرام:\n"+text);return new Promise(function(r){setTimeout(function(){r({ok:true,preview:true})},500)});}
-  return fetch("https://api.telegram.org/bot"+TG.token+"/sendMessage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:TG.chat,text:text,disable_web_page_preview:true})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.description||"tg");return j});
+/* ===== الربط: الطلب يروح لوسيط آمن (Google Apps Script) → قناة تلكرام «طلبات الجسمي» + شيت =====
+   التوكن مو هنا؛ موجود بحساب الدار. */
+var RELAY="https://script.google.com/macros/s/AKfycbzCI8ZMLFJSYv1Bxrq01OtwmTzFmahi41_Ii9qMr-WVUacFA4u-e7E7tghx_Dbqhd6wXg/exec";
+function relay(payload){
+  return fetch(RELAY,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(payload),redirect:"follow"})
+    .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.error||"relay");return j});
 }
 function tierLabel(o){var q=o.items[0].qty;return q===1?"عرض واحد":q===2?"عرضين · خصم إضافي 50 ألف":"3 عروض · خصم إضافي 125 ألف"}
 function hairName(id){var m={urban:"أوربان",chic:"شيك",silky:"سيلكي",majestic:"ماجيستك"};return "عطر شعر "+(m[id]||id)+" · بـ28 ألف بدل 58 (عرض الثنائي)"}
@@ -695,8 +695,8 @@ function orderText(o,extra){
   return lines.join("\n");
 }
 var Backend={
-  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return tgSend("#طلب_جديد "+o.ref+"\n"+orderText(o)).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
-  addUpsell:function(o,item){var id=item.id.replace("hair-","");return tgSend("#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة:\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping))}
+  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return relay({kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o),text:"#طلب_جديد "+o.ref+"\n"+orderText(o)}).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
+  addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة:\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
 };
 })();
 </script>
