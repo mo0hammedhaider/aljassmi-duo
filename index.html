@@ -185,11 +185,11 @@ function paintTiers(){
 
 /* reviews */
 .rev{padding:46px 0}
-.shots{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px var(--pad) 6px;scrollbar-width:none}
+.shots{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px var(--pad) 6px;scrollbar-width:none}
 .shots::-webkit-scrollbar{display:none}
-.shot{flex:0 0 82%;max-width:420px;scroll-snap-align:center;background:#1b1714;border-radius:22px;padding:14px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-height:260px;box-shadow:0 14px 30px rgba(0,0,0,.18)}
+.shot{flex:0 0 78%;max-width:340px;scroll-snap-align:center;background:#1b1714;border-radius:22px;padding:10px;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;box-shadow:0 14px 30px rgba(0,0,0,.18)}
 .shot.light{background:#f2f2f2}
-.shot img{border-radius:12px;max-height:380px;width:auto;max-width:100%;margin:0 auto}
+.shot img{border-radius:14px;width:100%;height:auto;max-height:600px;object-fit:cover;object-position:top}
 .shot .tg{align-self:flex-start;font-size:12px;font-weight:700;background:var(--iv);color:var(--br);padding:4px 10px;border-radius:99px}
 .dots{display:flex;justify-content:center;gap:6px;margin-top:12px}
 .dots i{width:7px;height:7px;border-radius:9px;background:rgba(96,72,50,.22);transition:width .3s,background .3s}
@@ -413,12 +413,12 @@ a.cta,a.go{text-decoration:none}
 <!-- REVIEWS -->
 <section class="rev" style="background:#f3ebe2">
   <div class="wrap reveal">
-    <div class="kick">رسائل حقيقية وصلتنا على إنستغرام</div>
+    <div class="kick">محادثات حقيقية من إنستغرام، منشورة بإذن أصحابها</div>
     <h2 class="h2" style="margin-top:4px">شنو كتبولنا الزبائن</h2>
   </div>
   <div class="shots" id="shots"></div>
   <div class="dots" id="sdots"></div>
-  <p class="privacy">صور من محادثاتنا · شلنا الأسماء والصور حفاظاً على خصوصيتهم</p>
+  <p class="privacy">صور من محادثاتنا مثل ما هي، بإذن الزبائن</p>
   <div class="wrap">
     <div class="quotes" id="quotes"></div>
     <button class="more" id="moreQ">اعرض كل الرسائل</button>
@@ -484,7 +484,7 @@ a.cta,a.go{text-decoration:none}
       <div class="f"><label for="ph">رقم الموبايل</label><input id="ph" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07xxxxxxxxx" dir="ltr" style="text-align:right" required><div class="em">اكتب رقم عراقي صحيح يبدي بـ07</div></div>
       <div class="f"><label for="gv">المحافظة</label><select id="gv" name="governorate" required><option value="">اختار المحافظة</option></select><div class="em">اختار المحافظة</div></div>
       <div class="f"><label for="ad">العنوان (المنطقة وأقرب نقطة دالة)</label><textarea id="ad" name="address" required></textarea><div class="em">اكتب عنوانك</div></div>
-      <div class="f"><label>شكد عرض تريد؟</label><div class="tiers" data-tiers style="margin-top:4px"></div></div>
+      <div class="f"><label>كم مجموعة تريد من هذا العرض؟</label><div class="tiers" data-tiers style="margin-top:4px"></div></div>
       <div class="osum" id="osum"></div>
       <button class="submit" id="sub" type="submit">ثبّت الطلب · الدفع عند الاستلام</button>
       <div class="osafe"><span>✓ تستر ويّا المندوب</span><span>✓ ضمان <span class="n">7</span> أيام</span><span>✓ ما تدفع إلا بعد ما تجرّب</span></div>
@@ -592,8 +592,8 @@ var demo=new IntersectionObserver(function(es){if(es[0].isIntersecting){demo.dis
 demo.observe($(".mixer"));
 
 /* ===== reviews ===== */
-var SHOTS=[["01","كيفورا + دمار",0],["09","كيفورا",0],["10","كيفورا",0],["03","كيفورا + دمار",0],["04","",0],["07","",0],["11","",1],["14","",0],["13","",0],["12","",0],["06","",1],["02","داريوس + الخدمة",0],["05","دمار",0],["08","دمار",0]];
-$("#shots").innerHTML=SHOTS.map(function(s){return'<div class="shot'+(s[2]?" light":"")+'">'+(s[1]?'<span class="tg">'+s[1]+'</span>':"")+'<img loading="lazy" src="rev-'+s[0]+'.jpg" alt="رسالة زبون على إنستغرام"></div>'}).join("");
+var SHOTS=[["01","كيفورا + دمار",0],["02","داريوس + الخدمة",0],["03","كيفورا + دمار",0],["04","",0],["05","",0],["06","",0],["07","",0],["08","",0],["09","دمار",0],["10","دمار",0],["11","كيفورا",0]];
+$("#shots").innerHTML=SHOTS.map(function(s){return'<div class="shot'+(s[2]?" light":"")+'">'+(s[1]?'<span class="tg">'+s[1]+'</span>':"")+'<img loading="lazy" src="shot-'+s[0]+'.jpg" alt="رسالة زبون على إنستغرام"></div>'}).join("");
 $("#sdots").innerHTML=SHOTS.map(function(){return"<i></i>"}).join("");
 var sh=$("#shots");
 function curShot(){var cs=$$(".shot",sh),mid=sh.getBoundingClientRect().left+sh.clientWidth/2,best=0,bd=1e9;cs.forEach(function(c,i){var r=c.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-mid);if(d<bd){bd=d;best=i}});return best}
