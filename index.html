@@ -680,22 +680,23 @@ function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
 
 /* ===== الربط: الطلب ينرسل لقناة تلكرام «طلبات الجسمي» بنفس صيغة الفريق =====
    TG.token و TG.chat يتحطون من إعدادات محمد. بدونهم الصفحة تشتغل بوضع المعاينة (ما ينرسل شي). */
-var TG=window.AJ_TG||{token:"",chat:""};
+var TG=window.AJ_TG||{token:"",chat:"-1004343401586"};
 function tgSend(text){
   if(!TG.token||!TG.chat){console.info("[معاينة] رسالة تلكرام:\n"+text);return new Promise(function(r){setTimeout(function(){r({ok:true,preview:true})},500)});}
   return fetch("https://api.telegram.org/bot"+TG.token+"/sendMessage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:TG.chat,text:text,disable_web_page_preview:true})}).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.description||"tg");return j});
 }
-function tierLabel(o){var q=o.items[0].qty;return q===1?"الثنائي المختلف (سارفن + كيفورا + مخمرية)":q===2?"الثنائي المختلف × 2 (عرضين، خصم إضافي 50 ألف)":"الثنائي المختلف × 3 (3 عروض، خصم إضافي 125 ألف)"}
+function tierLabel(o){var q=o.items[0].qty;return q===1?"عرض واحد":q===2?"عرضين · خصم إضافي 50 ألف":"3 عروض · خصم إضافي 125 ألف"}
+function hairName(id){var m={urban:"أوربان",chic:"شيك",silky:"سيلكي",majestic:"ماجيستك"};return "عطر شعر "+(m[id]||id)+" · بـ28 ألف بدل 58 (عرض الثنائي)"}
 function orderText(o,extra){
-  var lines=["الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"الطلب:","المنتج: "+tierLabel(o)];
-  if(extra) lines.push("+ "+extra.name+" بـ"+money(extra.price)+" (خصم 30 ألف)");
+  var lines=["الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"","تفاصيل الطلب:","المنتج: الثنائي المختلف، العدد: 1","العرض: "+tierLabel(o)];
+  if(extra) lines.push("المنتج: "+hairName(extra.id)+"، العدد: 1");
   lines.push("السعر: "+money(o.total+(extra?extra.price:0))+" وتوصيل "+money(o.shipping));
   lines.push("","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف");
   return lines.join("\n");
 }
 var Backend={
   placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return tgSend("#طلب_جديد "+o.ref+"\n"+orderText(o)).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
-  addUpsell:function(o,item){var h=HAIR.items.filter(function(x){return "hair-"+x.id===item.id})[0];return tgSend("#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+" · الرقم: "+o.phone+"\n+ عطر شعر "+(h?h.name:item.id)+" بـ"+money(item.price)+" (خصم 30 ألف)\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping))}
+  addUpsell:function(o,item){var id=item.id.replace("hair-","");return tgSend("#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة:\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping))}
 };
 })();
 </script>
