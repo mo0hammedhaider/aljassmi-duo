@@ -53,7 +53,7 @@ function paintTiers(){
 }
 /* عدّاد حقيقي: نبضة كل 60 ثانية للوسيط؛ يبين بس إذا في أرقام فعلية */
 (function(){var sid=(sessionStorage.getItem("aj_sid")||"");if(!sid){sid=Math.random().toString(36).slice(2,12)+Date.now().toString(36).slice(-4);try{sessionStorage.setItem("aj_sid",sid)}catch(e){}}
-  function ping(){fetch(RELAY+"?a=ping&s="+encodeURIComponent(sid)+"&t="+Date.now(),{redirect:"follow"}).then(function(r){return r.json()}).then(function(j){if(!j.ok)return;var el=$("#live");if(j.now>=2||j.today>=10){$("#liveNow").textContent=j.now;$("#liveToday").textContent=money(j.today);el.hidden=false}}).catch(function(){})}
+  function ping(){fetch(RELAY+"?a=ping&s="+encodeURIComponent(sid)+"&t="+Date.now(),{redirect:"follow"}).then(function(r){return r.json()}).then(function(j){if(!j.ok)return;if(j.orders){$("#ordersN").textContent=money(j.orders);$("#ordersPill").hidden=false}var el=$("#live");if(j.now>=2||j.today>=10){$("#liveNow").textContent=j.now;$("#liveToday").textContent=money(j.today);el.hidden=false}}).catch(function(){})}
   ping();setInterval(function(){if(!document.hidden)ping()},60000);})();
 /* ticker */
 .ticker{background:var(--deeper);color:var(--iv);overflow:hidden;white-space:nowrap;font-size:13px;font-weight:500;height:34px;display:flex;align-items:center}
@@ -84,6 +84,7 @@ function paintTiers(){
 .proof{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .pf{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:13px;color:var(--br);text-decoration:none}
 .pf b{font-weight:700}.pf small{color:var(--muted);font-size:12px}
+.pf.hot{background:var(--br);color:var(--iv);border-color:var(--br)}.pf.hot small{color:rgba(249,243,237,.7)}
 .pf .stars{color:#c9a24a;letter-spacing:1px;font-size:13px}
 .pf .dot{width:8px;height:8px;border-radius:50%;background:#3d8f4c;box-shadow:0 0 0 0 rgba(61,143,76,.5);animation:pulse 1.8s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,143,76,.45)}70%{box-shadow:0 0 0 8px rgba(61,143,76,0)}100%{box-shadow:0 0 0 0 rgba(61,143,76,0)}}
@@ -352,6 +353,7 @@ a.cta,a.go{text-decoration:none}
     <div class="names"><span><b>سارفن</b> 100 مل</span>·<span><b>كيفورا</b> 100 مل</span>·<span><b>مخمرية</b> فزاع الخير</span></div>
     <div class="proof">
       <div class="pf"><b>+<span class="n">86,000</span> طلب</b><small>توصّل لكل العراق</small></div>
+      <div class="pf hot" id="ordersPill" hidden><b>تثبّت <span class="n" id="ordersN">–</span> طلب على هذا العرض</b><small>يتحدّث مع كل طلب</small></div>
       <a class="pf" href="#rev"><span class="stars">★★★★★</span><b>تقييم زبائننا على Google</b><small>+<span class="n">25</span> رأي بالاسم والصورة</small></a>
       <div class="pf live" id="live" hidden><span class="dot"></span><b><span class="n" id="liveNow">–</span> يشاهدون العرض هسه</b><small><span class="n" id="liveToday">–</span> شافوه اليوم</small></div>
     </div>
@@ -553,7 +555,7 @@ function paintTiers(){
 }
 /* عدّاد حقيقي: نبضة كل 60 ثانية للوسيط؛ يبين بس إذا في أرقام فعلية */
 (function(){var sid=(sessionStorage.getItem("aj_sid")||"");if(!sid){sid=Math.random().toString(36).slice(2,12)+Date.now().toString(36).slice(-4);try{sessionStorage.setItem("aj_sid",sid)}catch(e){}}
-  function ping(){fetch(RELAY+"?a=ping&s="+encodeURIComponent(sid)+"&t="+Date.now(),{redirect:"follow"}).then(function(r){return r.json()}).then(function(j){if(!j.ok)return;var el=$("#live");if(j.now>=2||j.today>=10){$("#liveNow").textContent=j.now;$("#liveToday").textContent=money(j.today);el.hidden=false}}).catch(function(){})}
+  function ping(){fetch(RELAY+"?a=ping&s="+encodeURIComponent(sid)+"&t="+Date.now(),{redirect:"follow"}).then(function(r){return r.json()}).then(function(j){if(!j.ok)return;if(j.orders){$("#ordersN").textContent=money(j.orders);$("#ordersPill").hidden=false}var el=$("#live");if(j.now>=2||j.today>=10){$("#liveNow").textContent=j.now;$("#liveToday").textContent=money(j.today);el.hidden=false}}).catch(function(){})}
   ping();setInterval(function(){if(!document.hidden)ping()},60000);})();
 /* ticker */
 var tk=["تجرّب التستر قبل لا تدفع","ضمان 7 أيام استبدال واسترجاع","توصيل لكل المحافظات 5,000","بغداد خلال 18 ساعة","الدفع عند الاستلام"];
@@ -689,7 +691,7 @@ $("#form").addEventListener("submit",function(e){e.preventDefault();
   if(bad){$(".f.err input,.f.err select,.f.err textarea").focus();return}
   $("#sub").disabled=true;$("#sub").textContent="لحظة…";
   var T=TIERS[SEL];ORDER={name:nm,phone:ph,governorate:gv,address:ad,items:[{id:OFFER.id,qty:T.q,price:T.price,listPrice:T.was}],total:T.price,shipping:OFFER.ship};
-  Backend.placeOrder(ORDER).then(function(res){ORDER.ref=res&&res.ref;showUpsell()}).catch(function(){$("#sub").disabled=false;$("#sub").textContent="صار خلل، جرّب مرة ثانية"});
+  Backend.placeOrder(ORDER).then(function(res){ORDER.ref=res&&res.ref;try{var n=parseInt(($("#ordersN").textContent||"").replace(/\D/g,""),10);if(n){$("#ordersN").textContent=money(n+1)}}catch(e){}showUpsell()}).catch(function(){$("#sub").disabled=false;$("#sub").textContent="صار خلل، جرّب مرة ثانية"});
 });
 
 /* ===== upsell: عطر الشعر بخصم 30 ألف بعد تثبيت الطلب ===== */
