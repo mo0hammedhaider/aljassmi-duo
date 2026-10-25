@@ -659,7 +659,7 @@ $("#faq").innerHTML=FAQ.map(function(q,i){return'<details class="qa"'+(i===0?" o
 
 /* ===== sticky ===== */
 var heroCta=$(".hero .cta"),orderSec=$("#order"),inHero=true,inOrder=false;
-function stick(){$("#sticky").classList.toggle("show",!inHero&&!inOrder)}
+function stick(){$("#sticky").classList.add("show")}stick();
 new IntersectionObserver(function(e){inHero=e[0].isIntersecting;stick()}).observe(heroCta);
 new IntersectionObserver(function(e){inOrder=e[0].isIntersecting;stick()},{threshold:.05}).observe(orderSec);
 $$("[data-go]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();orderSec.scrollIntoView({behavior:"smooth"});setTimeout(function(){$("#nm").focus({preventScroll:true})},700)})});
