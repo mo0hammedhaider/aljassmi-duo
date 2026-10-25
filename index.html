@@ -40,17 +40,6 @@ section{position:relative}
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}*{animation:none!important;transition:none!important}}
 
-/* tiers */
-function paintTiers(){
-  $$("[data-tiers]").forEach(function(box){box.innerHTML=TIERS.map(function(t,i){return'<button type="button" class="tier'+(i===SEL?" on":"")+'" data-i="'+i+'">'+(t.badge?'<span class="badge">'+t.badge+'</span>':"")+'<span class="rd"></span><span class="tt"><b>'+t.t+'</b><span>'+t.sub+'</span>'+(t.sub2?'<span>'+t.sub2+'</span>':'')+'<span class="save">توفّر '+money(t.saved)+' د.ع</span></span><span class="tp"><s>'+money(t.was)+'</s><b>'+money(t.price)+'</b></span></button>'}).join("")});
-  $$(".tier").forEach(function(b){b.addEventListener("click",function(){SEL=+b.dataset.i;paintTiers()})});
-  var t=TIERS[SEL];
-  $("#osum").innerHTML='<div><span>الثنائي المختلف × <span class="n">'+t.q+'</span></span><span class="n">'+money(t.was)+'</span></div>'+
-    '<div><span>الخصم</span><span class="n">−'+money(t.saved)+'</span></div><div><span>التوصيل</span><span class="n">'+money(OFFER.ship)+'</span></div>'+
-    '<div class="tot"><span>المجموع عند الاستلام</span><span><span class="n">'+money(t.price+OFFER.ship)+'</span> د.ع</span></div>';
-  $("#hWas").textContent=money(t.was);$("#hNow").textContent=money(t.price);$("#hLab").textContent=t.q>1?"السعر الحالي · "+t.q+" عروض":"السعر الحالي";
-  $("#stPr").innerHTML='<s>'+money(t.was)+'</s><b>'+money(t.price)+' <small>د.ع'+(t.q>1?" · "+t.q+" عروض":"")+'</small></b>';
-}
 /* ticker */
 .ticker{background:var(--deeper);color:var(--iv);overflow:hidden;white-space:nowrap;font-size:13px;font-weight:500;height:34px;display:flex;align-items:center}
 .ticker .t{display:inline-flex;gap:28px;padding-inline-start:28px;animation:tick 26s linear infinite}
@@ -300,6 +289,15 @@ function paintTiers(){
 .add[disabled]{opacity:.45}
 .skip{display:block;margin:10px auto 0;font-size:14px;color:var(--muted);text-decoration:underline}
 .done h3{text-align:center}.done p{text-align:center}
+.hwhy{list-style:none;margin-top:12px;display:grid;gap:6px}
+.hwhy li{position:relative;padding-right:24px;font-size:14px;line-height:1.6;color:#5d4a38}
+.hwhy li::before{content:"✓";position:absolute;right:2px;color:#3d6b45;font-weight:900}
+.ld{text-align:center;padding:26px 0 10px}.ld h3{text-align:center;margin-top:16px}
+.spin{width:54px;height:54px;margin:0 auto;border-radius:50%;border:4px solid #efe5da;border-top-color:var(--br);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ldbar{height:6px;border-radius:9px;background:#efe5da;overflow:hidden;margin:16px auto 0;max-width:260px}
+.ldbar i{display:block;height:100%;width:8%;background:var(--br);border-radius:9px;animation:ldb 5s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes ldb{to{width:94%}}
 
 .foot{padding:34px 0 120px;text-align:center;background:var(--deeper);color:rgba(249,243,237,.7)}
 .foot img{height:44px;margin:0 auto;opacity:.9}
@@ -327,7 +325,7 @@ a.cta,a.go{text-decoration:none}
 .dark .tier .tt span.save{color:#1f4a28;background:#dcebd8}
 .pf[hidden]{display:none}
 </style>
-<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');var AJ_PIXEL='1812474689780206';/* ← بكسل الصفحة: بدّل الرقم هنا بس */fbq('init',AJ_PIXEL);fbq('track','PageView');fbq('track','ViewContent',{content_ids:['1000007620'],content_name:'الثنائي المختلف',content_type:'product',value:118000,currency:'IQD'});</script>
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');var AJ_PIXEL='2890047974682209';/* ← بكسل الصفحة: بدّل الرقم هنا بس */fbq('init',AJ_PIXEL);fbq('track','PageView');fbq('track','ViewContent',{content_ids:['1000007620'],content_name:'الثنائي المختلف',content_type:'product',value:118000,currency:'IQD'});</script>
 </head>
 <body>
 
@@ -686,26 +684,42 @@ $("#form").addEventListener("submit",function(e){e.preventDefault();
   var nm=$("#nm").value.trim(),ph=normPhone($("#ph").value),gv=$("#gv").value,ad=$("#ad").value.trim();
   var bad=[setErr("nm",nm.length<2),setErr("ph",!/^07[3-9]\d{8}$/.test(ph)) && ($("#phMsg").textContent=ph.length<11?"الرقم ناقص: "+ph.length+" من 11":"اكتب رقم عراقي صحيح يبدي بـ07"),setErr("gv",!gv),setErr("ad",ad.length<4)].some(Boolean);
   if(bad){$(".f.err input,.f.err select,.f.err textarea").focus();return}
-  $("#sub").disabled=true;$("#sub").textContent="لحظة…";
   var T=TIERS[SEL];ORDER={name:nm,phone:ph,governorate:gv,address:ad,items:[{id:OFFER.id,qty:T.q,price:T.price,listPrice:T.was}],total:T.price,shipping:OFFER.ship};
-  Backend.placeOrder(ORDER).then(function(res){ORDER.ref=res&&res.ref;try{var n=parseInt(($("#ordersN").textContent||"").replace(/\D/g,""),10);if(n){$("#ordersN").textContent=money(n+1)}}catch(e){}showUpsell()}).catch(function(){$("#sub").disabled=false;$("#sub").textContent="صار خلل، جرّب مرة ثانية"});
+  SENT=null;showUpsell();
 });
 
-/* ===== upsell: عطر الشعر بخصم 30 ألف بعد تثبيت الطلب ===== */
-var pick=null;
+/* ===== قبل التثبيت: عرض عطر الشعر بـ28 بدل 58، وبعدها نرسل الطلب مرة وحدة ===== */
+var pick=null,SENT=null,AUTO=null;
+var HAIR_WHY=["يحمي شعرك من حرارة الشسوار والشمس","خالي من الكحول، وبدون كبريتات أو سيليكون أو بارابين","بيه زيت الأرغان وزيت جوز الهند للترطيب","فيتامين E و B5، وكيراتين نانو يرجّع اللمعة","خفيف ومو دهني: إذا تشسور هواي يغنيك عن الكريمات الثقيلة"];
 function showUpsell(){
-  $("#upSheet").innerHTML='<div class="ok"><i>✓</i>طلبك تثبّت</div><h3>قبل لا نسكّر… عرض بس إلك هسه</h3><p class="lead">ضيف عطر شعر لنفس الطلب ونفس التوصيل، بخصم <b class="n" style="color:var(--br)">30,000</b> د.ع.</p><div class="hairs">'+
+  $("#upSheet").innerHTML='<h3>قبل لا نثبّت الطلب… هذا عرض بس إلك</h3><p class="lead">ضيف عطر شعر لنفس الطلب ونفس التوصيل بـ<b class="n" style="color:var(--br)">28,000</b> بدل <s class="n">58,000</s>.</p>'+
+   '<ul class="hwhy">'+HAIR_WHY.map(function(w){return"<li>"+w+"</li>"}).join("")+'</ul><div class="hairs">'+
    HAIR.items.map(function(h){return'<button class="hair" data-id="'+h.id+'"><img src="img-hair-'+h.id+'.jpg" alt="عطر شعر '+h.name+'"><b>'+h.name+'</b><div class="hp"><s>'+money(HAIR.was)+'</s><span>'+money(HAIR.price)+'</span></div></button>'}).join("")+
-   '</div><button class="add" id="addH" disabled>اختار عطر الشعر</button><button class="skip" id="skipH">لا شكراً، كمّل بدونه</button>';
+   '</div><button class="add" id="addH" disabled>اختار عطر الشعر</button><button class="skip" id="skipH">ثبّت الطلب بدونه</button>';
   $("#up").classList.add("open");document.body.style.overflow="hidden";
-  $$(".hair").forEach(function(b){b.addEventListener("click",function(){pick=b.dataset.id;$$(".hair").forEach(function(o){o.classList.toggle("on",o===b)});var h=HAIR.items.filter(function(x){return x.id===pick})[0];$("#addH").disabled=false;$("#addH").textContent="ضيف "+h.name+" بـ"+money(HAIR.price)+" د.ع"})});
-  $("#addH").addEventListener("click",function(){$("#addH").disabled=true;$("#addH").textContent="لحظة…";Backend.addUpsell(ORDER,{id:"hair-"+pick,qty:1,price:HAIR.price}).then(function(){done(true)}).catch(function(){$("#addH").disabled=false;$("#addH").textContent="صار خلل، جرّب مرة ثانية"})});
-  $("#skipH").addEventListener("click",function(){done(false)});
+  $$(".hair").forEach(function(b){b.addEventListener("click",function(){pick=b.dataset.id;$$(".hair").forEach(function(o){o.classList.toggle("on",o===b)});var h=HAIR.items.filter(function(x){return x.id===pick})[0];$("#addH").disabled=false;$("#addH").textContent="ضيف "+h.name+" وثبّت الطلب"})});
+  $("#addH").addEventListener("click",function(){finish(pick)});
+  $("#skipH").addEventListener("click",function(){finish(null)});
+  // أمان: إذا سكّر الصفحة أو ما اختار خلال دقيقة، الطلب يروح بدون عطر الشعر
+  clearTimeout(AUTO);AUTO=setTimeout(function(){finish(null,true)},60000);
 }
+addEventListener("pagehide",function(){if(ORDER&&!SENT)beaconOrder()});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"&&ORDER&&!SENT)beaconOrder()});
+function loading(){$("#upSheet").innerHTML='<div class="ld"><div class="spin"></div><h3 id="ldT">نثبّت طلبك…</h3><div class="ldbar"><i></i></div><p class="lead">لا تسكّر الصفحة، ثواني بس.</p></div>';
+  var msgs=["نثبّت طلبك…","نرسله لفريق الدار…","نجهّز التستر ويّا طلبك…"],k=0;LDI=setInterval(function(){k=(k+1)%msgs.length;var t=$("#ldT");t&&(t.textContent=msgs[k])},1300)}
+var LDI=null;
+function finish(hairId,silent){if(SENT)return;clearTimeout(AUTO);
+  var extra=hairId?{id:"hair-"+hairId,qty:1,price:HAIR.price}:null;
+  if(!silent)loading();
+  SENT=Backend.placeOrder(ORDER,extra).then(function(res){ORDER.ref=res&&res.ref;clearInterval(LDI);done(!!extra)})
+   .catch(function(){clearInterval(LDI);SENT=null;$("#upSheet").innerHTML='<h3>صار خلل بالاتصال</h3><p class="lead">طلبك ما وصل بعد. جرّب مرة ثانية.</p><button class="add" id="retry">أعد المحاولة</button>';$("#retry").addEventListener("click",function(){finish(hairId)})});
+}
+function beaconOrder(){try{SENT=true;var p=Backend.payload(ORDER,null);navigator.sendBeacon(RELAY,new Blob([JSON.stringify(p)],{type:"text/plain;charset=UTF-8"}))}catch(e){}}
 function done(added){var tot=ORDER.total+OFFER.ship+(added?HAIR.price:0);
-  $("#upSheet").innerHTML='<div class="done"><div class="ok" style="justify-content:center"><i>✓</i>تم</div><h3>شكراً '+ORDER.name.split(" ")[0]+' 🤍</h3><p class="lead">راح نتصل بيك على <span class="n" dir="ltr">'+ORDER.phone+'</span> نأكد العنوان. المجموع عند الاستلام <b class="n" style="color:var(--br)">'+money(tot)+'</b> د.ع، وتجرّب التستر قبل لا تدفع.</p><button class="add" id="closeUp">تمام</button></div>';
+  $("#upSheet").innerHTML='<div class="done"><div class="ok" style="justify-content:center"><i>✓</i>طلبك تثبّت</div><h3>شكراً '+ORDER.name.split(" ")[0]+' 🤍</h3><p class="lead">راح نتصل بيك على <span class="n" dir="ltr">'+ORDER.phone+'</span> نأكد العنوان. المجموع عند الاستلام <b class="n" style="color:var(--br)">'+money(tot)+'</b> د.ع، وتجرّب التستر قبل لا تدفع.</p><button class="add" id="closeUp">تمام</button></div>';
   $("#closeUp").addEventListener("click",function(){$("#up").classList.remove("open");document.body.style.overflow=""});
-  $("#sub").textContent="تم تثبيت طلبك ✓";
+  $("#sub").disabled=true;$("#sub").textContent="تم تثبيت طلبك ✓";
+  try{var n=parseInt(($("#ordersN").textContent||"").replace(/\D/g,""),10);if(n){$("#ordersN").textContent=money(n+1)}}catch(e){}
 }
 
 /* ===== الربط: الطلب يروح لوسيط آمن (Google Apps Script) → قناة تلكرام «طلبات الجسمي» + شيت =====
@@ -720,14 +734,20 @@ var SRC=(function(){var k="aj_src",q=new URLSearchParams(location.search),v={};[
   try{if(Object.keys(v).length)sessionStorage.setItem(k,JSON.stringify(v));else v=JSON.parse(sessionStorage.getItem(k)||"{}")}catch(e){}return v})();
 function srcLine(){var a=SRC.utm_content||SRC.utm_campaign;return a?"الإعلان: "+a+(SRC.utm_campaign&&SRC.utm_content?" · "+SRC.utm_campaign:""):(SRC.fbclid?"الإعلان: ميتا (بدون اسم)":"الإعلان: زيارة مباشرة")}
 function orderText(o,extra){
-  var lines=["الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"","تفاصيل الطلب:","المنتج: الثنائي المختلف، العدد: 1","العرض: "+tierLabel(o)];
-  if(extra) lines.push("المنتج: "+hairName(extra.id)+"، العدد: 1");
-  lines.push("السعر: "+money(o.total+(extra?extra.price:0))+" وتوصيل "+money(o.shipping));
-  lines.push("","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف",srcLine());
-  return lines.join("\n");
+  var q=o.items[0].qty, sum=o.total+(extra?extra.price:0);
+  var L=["━━━━━━━━━━━━",
+    "🛍 العرض: الثنائي المختلف · "+tierLabel(o),
+    "📦 المحتوى: "+(q>1?q+" × ":"")+"(سارفن 100 مل + كيفورا 100 مل + مخمرية فزاع الخير)"];
+  if(extra) L.push("➕ إضافة على نفس الطلب: عطر شعر "+({urban:"أوربان",chic:"شيك",silky:"سيلكي",majestic:"ماجيستك"}[extra.id]||extra.id)+" بـ28,000 بدل 58,000");
+  L.push("💰 المجموع: "+money(sum)+" + توصيل "+money(o.shipping)+" = "+money(sum+o.shipping)+" د.ع (دفع عند الاستلام)","━━━━━━━━━━━━","",
+    "الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"","تفاصيل الطلب:","المنتج: الثنائي المختلف، العدد: 1","العرض: "+tierLabel(o));
+  if(extra) L.push("المنتج: "+hairName(extra.id)+"، العدد: 1");
+  L.push("السعر: "+money(sum)+" وتوصيل "+money(o.shipping),"","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف",srcLine());
+  return L.join("\n");
 }
 var Backend={
-  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return relay({kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o),text:"#طلب_جديد "+o.ref+"\n"+orderText(o)}).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty},{eventID:o.ref})}catch(e){}return {ref:o.ref}})},
+  payload:function(o,extra){if(!o.ref)o.ref="DUO-"+Date.now().toString(36).toUpperCase();return {kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o)+(extra?" + "+hairName(extra.id.replace("hair-","")):""),text:"#طلب_جديد "+o.ref+"\n"+orderText(o,extra?{id:extra.id.replace("hair-",""),price:extra.price}:null)}},
+  placeOrder:function(o,extra){return relay(Backend.payload(o,extra)).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total+(extra?extra.price:0),currency:"IQD",num_items:o.items[0].qty},{eventID:o.ref})}catch(e){}return {ref:o.ref}})},
   addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة (لطلب الثنائي المختلف):\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
 };
 })();
