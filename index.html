@@ -327,7 +327,7 @@ a.cta,a.go{text-decoration:none}
 .dark .tier .tt span.save{color:#1f4a28;background:#dcebd8}
 .pf[hidden]{display:none}
 </style>
-<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1573799990745566');fbq('track','PageView');fbq('track','ViewContent',{content_ids:['1000007620'],content_name:'الثنائي المختلف',content_type:'product',value:118000,currency:'IQD'});</script>
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');var AJ_PIXEL='1573799990745566';/* ← بكسل الصفحة: بدّل الرقم هنا بس */fbq('init',AJ_PIXEL);fbq('track','PageView');fbq('track','ViewContent',{content_ids:['1000007620'],content_name:'الثنائي المختلف',content_type:'product',value:118000,currency:'IQD'});</script>
 </head>
 <body>
 
@@ -348,7 +348,7 @@ a.cta,a.go{text-decoration:none}
     </div>
     <div class="names"><span><b>سارفن</b> 100 مل</span>·<span><b>كيفورا</b> 100 مل</span>·<span><b>مخمرية</b> فزاع الخير</span></div>
     <div class="proof">
-      <div class="pf"><b>+<span class="n">86,000</span> طلب</b><small>توصّل لكل العراق</small></div>
+      <div class="pf"><b>+<span class="n">579,000</span> طلب</b><small>خلال 2026 · لكل العراق</small></div>
       <div class="pf hot" id="ordersPill" hidden><span class="dot"></span><span class="lv">LIVE</span><b>تثبّت <span class="n" id="ordersN">–</span> طلب لحد الآن على هذا العرض</b></div>
       <a class="pf" href="#rev"><span class="stars">★★★★★</span><b>تقييم زبائننا على Google</b><small>+<span class="n">25</span> رأي بالاسم والصورة</small></a>
       <div class="pf live" id="live" hidden><span class="dot"></span><b><span class="n" id="liveNow">–</span> يشاهدون العرض هسه</b><small><span class="n" id="liveToday">–</span> شافوه اليوم</small></div>
@@ -563,7 +563,7 @@ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isInter
 $$(".reveal").forEach(function(el){io.observe(el)});
 
 /* ===== reels ===== */
-var REELS=[["dania","دانيا","تجربة سارفن"],["laredo2","لاريدو وإيميلي","سارفن وكيفورا"],["duo","دانيا + رسالة زبونة","سارفن وكيفورا"],["laredo1","لاريدو","سارفن"],["voice","رسالة صوتية من زبونة","كيفورا"]];
+var REELS=[["ugc","دانيا","سارفن وكيفورا بباقة وحدة"],["dania","دانيا","تجربة سارفن"],["laredo2","لاريدو وإيميلي","سارفن وكيفورا"],["duo","دانيا + رسالة زبونة","سارفن وكيفورا"],["laredo1","لاريدو","سارفن"],["voice","رسالة صوتية من زبونة","كيفورا"]];
 var SND_OFF='<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>',SND_ON='<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
 $("#rail").innerHTML=REELS.map(function(r){return '<div class="reel"><video muted loop playsinline preload="none" poster="v-'+r[0]+'.jpg" src="v-'+r[0]+'.mp4"></video><button class="snd" aria-label="الصوت">'+SND_OFF+'</button><div class="lab"><b>'+r[1]+'</b><span>'+r[2]+'</span></div></div>'}).join("");
 var vio=new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.intersectionRatio>.6){v.play().catch(function(){})}else{v.pause()}})},{threshold:[0,.6,1]});
@@ -716,15 +716,18 @@ function relay(payload){
 }
 function tierLabel(o){var q=o.items[0].qty;return q===1?"عرض واحد":q===2?"عرضين · خصم إضافي 50 ألف":"3 عروض · خصم إضافي 125 ألف"}
 function hairName(id){var m={urban:"أوربان",chic:"شيك",silky:"سيلكي",majestic:"ماجيستك"};return "عطر شعر "+(m[id]||id)+" · بـ28 ألف بدل 58 (عرض الثنائي)"}
+var SRC=(function(){var k="aj_src",q=new URLSearchParams(location.search),v={};["utm_source","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(n){if(q.get(n))v[n]=q.get(n).slice(0,80)});
+  try{if(Object.keys(v).length)sessionStorage.setItem(k,JSON.stringify(v));else v=JSON.parse(sessionStorage.getItem(k)||"{}")}catch(e){}return v})();
+function srcLine(){var a=SRC.utm_content||SRC.utm_campaign;return a?"الإعلان: "+a+(SRC.utm_campaign&&SRC.utm_content?" · "+SRC.utm_campaign:""):(SRC.fbclid?"الإعلان: ميتا (بدون اسم)":"الإعلان: زيارة مباشرة")}
 function orderText(o,extra){
   var lines=["الاسم: "+o.name,"الرقم: "+o.phone,"العنوان: "+o.governorate+" "+o.address,"","تفاصيل الطلب:","المنتج: الثنائي المختلف، العدد: 1","العرض: "+tierLabel(o)];
   if(extra) lines.push("المنتج: "+hairName(extra.id)+"، العدد: 1");
   lines.push("السعر: "+money(o.total+(extra?extra.price:0))+" وتوصيل "+money(o.shipping));
-  lines.push("","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف");
+  lines.push("","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف",srcLine());
   return lines.join("\n");
 }
 var Backend={
-  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return relay({kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o),text:"#طلب_جديد "+o.ref+"\n"+orderText(o)}).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty})}catch(e){}return {ref:o.ref}})},
+  placeOrder:function(o){o.ref="DUO-"+Date.now().toString(36).toUpperCase();return relay({kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o),text:"#طلب_جديد "+o.ref+"\n"+orderText(o)}).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total,currency:"IQD",num_items:o.items[0].qty},{eventID:o.ref})}catch(e){}return {ref:o.ref}})},
   addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة (لطلب الثنائي المختلف):\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
 };
 })();
