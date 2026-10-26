@@ -745,8 +745,9 @@ function orderText(o,extra){
   L.push("السعر: "+money(sum)+" وتوصيل "+money(o.shipping),"","ملاحظة: تجربة العطر من خلال التيستر فقط","المصدر: صفحة الثنائي المختلف",srcLine());
   return L.join("\n");
 }
+function capiData(v,ids,n){function ck(k){var m=document.cookie.match(new RegExp("(?:^|; )"+k+"=([^;]*)"));return m?decodeURIComponent(m[1]):""}var fbc=ck("_fbc");if(!fbc&&SRC.fbclid)fbc="fb.1."+Date.now()+"."+SRC.fbclid;return {fbp:ck("_fbp"),fbc:fbc,ua:navigator.userAgent.slice(0,400),url:location.href.split("#")[0].slice(0,500),value:v,currency:"IQD",ids:ids,n:n}}
 var Backend={
-  payload:function(o,extra){if(!o.ref)o.ref="DUO-"+Date.now().toString(36).toUpperCase();return {kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o)+(extra?" + "+hairName(extra.id.replace("hair-","")):""),text:"#طلب_جديد "+o.ref+"\n"+orderText(o,extra?{id:extra.id.replace("hair-",""),price:extra.price}:null)}},
+  payload:function(o,extra){if(!o.ref)o.ref="DUO-"+Date.now().toString(36).toUpperCase();return {kind:"order",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:tierLabel(o)+(extra?" + "+hairName(extra.id.replace("hair-","")):""),text:"#طلب_جديد "+o.ref+"\n"+orderText(o,extra?{id:extra.id.replace("hair-",""),price:extra.price}:null),capi:capiData(o.total+(extra?extra.price:0),["1000007620"],o.items[0].qty)}},
   placeOrder:function(o,extra){return relay(Backend.payload(o,extra)).then(function(){try{window.fbq&&fbq("track","Purchase",{content_ids:["1000007620"],content_type:"product",value:o.total+(extra?extra.price:0),currency:"IQD",num_items:o.items[0].qty},{eventID:o.ref})}catch(e){}return {ref:o.ref}})},
   addUpsell:function(o,item){var id=item.id.replace("hair-","");return relay({kind:"addon",ref:o.ref,name:o.name,phone:o.phone,governorate:o.governorate,summary:hairName(id),text:"#إضافة_للطلب "+o.ref+"\nالاسم: "+o.name+"\nالرقم: "+o.phone+"\n\nتفاصيل الإضافة (لطلب الثنائي المختلف):\nالمنتج: "+hairName(id)+"، العدد: 1\nالمجموع الجديد: "+money(o.total+item.price)+" وتوصيل "+money(o.shipping)})}
 };
